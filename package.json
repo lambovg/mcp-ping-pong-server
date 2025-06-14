@@ -1,0 +1,29 @@
+{
+  "name": "mcp-ping-pong-server",
+  "version": "1.0.0",
+  "description": "MCP server with ping/pong functionality",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "lint": "eslint src --ext .ts",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": ["mcp", "model-context-protocol"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "dotenv": "^16.4.5",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
