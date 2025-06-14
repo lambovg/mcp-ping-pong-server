@@ -4,11 +4,10 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   Tool,
-  TextContent,
-  ToolCallContent
+  CallToolResult
 } from '@modelcontextprotocol/sdk/types.js';
 import dotenv from 'dotenv';
-import { PingPongTool } from './tools/pingPongTool.js';
+import { PingPongTool } from './tools/pingPongTools';
 import { logger } from './utils/logger.js';
 import { ServerConfig } from './types/index.js';
 
@@ -74,17 +73,34 @@ class MCPPingPongServer {
         if (request.params.name === 'ping_pong') {
           const result = await this.pingPongTool.execute(request.params.arguments);
           
-          return {
+          // Return proper CallToolResult format
+          const toolResult: CallToolResult = {
             content: [
               {
                 type: 'text',
                 text: JSON.stringify(result, null, 2)
-              } as TextContent
+              }
             ]
           };
+          
+          return toolResult;
         }
 
-        throw new Error(`Unknown tool: ${request.params.name}`);
+        // For unknown tools, return an error
+        const errorResult: CallToolResult = {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: `Unknown tool: ${request.params.name}`,
+                timestamp: new Date().toISOString()
+              }, null, 2)
+            }
+          ],
+          isError: true
+        };
+        
+        return errorResult;
       } catch (error) {
         logger.error('Error calling tool', { 
           toolName: request.params.name,
@@ -93,7 +109,7 @@ class MCPPingPongServer {
 
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         
-        return {
+        const errorResult: CallToolResult = {
           content: [
             {
               type: 'text',
@@ -101,10 +117,12 @@ class MCPPingPongServer {
                 error: errorMessage,
                 timestamp: new Date().toISOString()
               }, null, 2)
-            } as TextContent
+            }
           ],
           isError: true
         };
+        
+        return errorResult;
       }
     });
   }
